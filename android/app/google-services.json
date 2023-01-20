@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "718713868592",
+    "project_id": "ijob-clone-app-a34e9",
+    "storage_bucket": "ijob-clone-app-a34e9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:718713868592:android:da7142087487328bd738f5",
+        "android_client_info": {
+          "package_name": "com.example.cupwork"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "718713868592-pm8up4vhoelpj0s9ing4uc4j78gp7h3n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzw61FV7qts6VIbgarBUejvwkaAVRl59w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "718713868592-pm8up4vhoelpj0s9ing4uc4j78gp7h3n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
