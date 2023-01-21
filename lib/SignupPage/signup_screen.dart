@@ -1,10 +1,13 @@
-// ignore_for_file: sized_box_for_whitespace
+// ignore_for_file: sized_box_for_whitespace, use_build_context_synchronously
 
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cupwork/Services/global_variables.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -66,6 +69,88 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
     super.initState();
   }
 
+  void _showImageDialog() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('please choose an option'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                InkWell(
+                  onTap: () {
+                    _getFromCamera();
+                  },
+                  child: Row(
+                    children: const [
+                      Padding(
+                        padding: EdgeInsets.all(4.00),
+                        child: Icon(
+                          Icons.camera,
+                          color: Colors.purple,
+                        ),
+                      ),
+                      Text(
+                        'Gallery',
+                        style: TextStyle(color: Colors.purple),
+                      )
+                    ],
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    _getFromGallery();
+                  },
+                  child: Row(
+                    children: const [
+                      Padding(
+                        padding: EdgeInsets.all(4.00),
+                        child: Icon(
+                          Icons.image,
+                          color: Colors.purple,
+                        ),
+                      ),
+                      Text(
+                        'Gallery',
+                        style: TextStyle(color: Colors.purple),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  void _getFromCamera() async {
+    XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.camera);
+    _cropImage(pickedFile!.path);
+    Navigator.pop(context);
+  }
+
+  void _getFromGallery() async {
+    XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    _cropImage(pickedFile!.path);
+    Navigator.pop(context);
+  }
+
+  void _cropImage(filepath) async {
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+      sourcePath: filepath,
+      maxHeight: 1080,
+      maxWidth: 1080,
+    );
+    if (croppedImage != null) {
+      setState(() {
+        imageFile = File(croppedImage.path);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -96,7 +181,7 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            //create show imagedialog
+                            _showImageDialog();
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
