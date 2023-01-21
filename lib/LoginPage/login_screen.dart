@@ -1,5 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cupwork/ForgetPassword/forget_password_screen.dart';
+import 'package:cupwork/Services/global_methods.dart';
 import 'package:cupwork/Services/global_variables.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -21,7 +27,9 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
 
   final FocusNode _passFocusNode = FocusNode();
   late bool _obscureText = true;
+  bool _isLoading = false;
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final _loginFormKey = GlobalKey<FormState>();
 
   @override
@@ -47,6 +55,37 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
           });
     _animationController.forward();
     super.initState();
+  }
+
+  void _submitFormOnLogin() async {
+    final isValid = _loginFormKey.currentState!.validate();
+
+    if (isValid) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        await _auth.signInWithEmailAndPassword(
+          email: _emailTextController.text.trim().toLowerCase(),
+          password: _passTextController.text.trim(),
+        );
+
+        Navigator.canPop(context) ? Navigator.pop(context) : null;
+      } catch (error) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        GlobalMethod.showErrorDialog(error: error.toString(), ctx: context);
+        if (kDebugMode) {
+          print('error occurred $error');
+        }
+      }
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -128,16 +167,18 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                           },
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
-                              suffixIcon: GestureDetector(onTap: () {
-                                setState(() {
-                                  _obscureText = !_obscureText;
-                                });
-                              },
-                              child: Icon(
-                                _obscureText ? Icons.visibility : Icons.visibility_off
-                                color: Colors.white,
-                              ),
-
+                              suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _obscureText = !_obscureText;
+                                  });
+                                },
+                                child: Icon(
+                                  _obscureText
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: Colors.white,
+                                ),
                               ),
                               hintText: 'Password',
                               hintStyle: const TextStyle(color: Colors.white),
@@ -150,7 +191,55 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                               errorBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.red),
                               )),
-                        )
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ForgetPassword()));
+                            },
+                            child: const Text(
+                              'Forget Password?',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        MaterialButton(
+                          onPressed: _submitFormOnLogin,
+                          color: Colors.cyan,
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(13)),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   )
