@@ -4,8 +4,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cupwork/ForgetPassword/forget_password_screen.dart';
 import 'package:cupwork/Services/global_methods.dart';
 import 'package:cupwork/Services/global_variables.dart';
+import 'package:cupwork/SignupPage/signup_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -34,6 +36,9 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
   @override
   void dispose() {
     _animationController.dispose();
+    _emailTextController.dispose();
+    _passTextController.dispose();
+    _passFocusNode.dispose();
     super.dispose();
   }
 
@@ -240,6 +245,36 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
+                        const SizedBox(
+                          height: 14,
+                        ),
+                        Center(
+                          child: RichText(
+                            text: TextSpan(children: [
+                              const TextSpan(
+                                  text: 'Do not have an account ?',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  )),
+                              const TextSpan(text: ''),
+                              TextSpan(
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const SignUp())),
+                                  text: 'Signup',
+                                  style: const TextStyle(
+                                    color: Colors.cyan,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  )),
+                            ]),
+                          ),
+                        )
                       ],
                     ),
                   )
