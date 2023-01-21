@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 // ignore_for_file: use_build_context_synchronously, unused_field
-=======
-// ignore_for_file: use_build_context_synchronously
->>>>>>> 7e8e6c109351751b16eb4caa2a0c7e2844ad50f0
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cupwork/ForgetPassword/forget_password_screen.dart';
@@ -31,12 +27,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
 
   final FocusNode _passFocusNode = FocusNode();
   late bool _obscureText = true;
-<<<<<<< HEAD
   late bool _isLoading = false;
-=======
-  bool _isLoading = false;
-
->>>>>>> 7e8e6c109351751b16eb4caa2a0c7e2844ad50f0
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _loginFormKey = GlobalKey<FormState>();
 
@@ -210,12 +201,8 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-<<<<<<< HEAD
                                       builder: (context) =>
                                           const ForgetPassword()));
-=======
-                                      builder: (context) => ForgetPassword()));
->>>>>>> 7e8e6c109351751b16eb4caa2a0c7e2844ad50f0
                             },
                             child: const Text(
                               'Forget Password?',
