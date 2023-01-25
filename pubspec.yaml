@@ -1,5 +1,5 @@
 name: cupwork
-description: A new Flutter project.
+description: CUPwork project that freelance app college,unversity ,preparatory student apply for work.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -48,6 +48,8 @@ dependencies:
   firebase_core: ^2.4.1
   cloud_firestore: ^4.3.1
   firebase_storage: ^11.0.10
+  flutter_launcher_icons: ^0.11.0
+  
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +61,10 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/cup.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
