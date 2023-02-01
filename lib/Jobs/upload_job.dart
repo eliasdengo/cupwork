@@ -117,7 +117,7 @@ class _UploadJobNowState extends State<UploadJobNow> {
                               fontSize: 16,
                             ),
                           ),
-                          )
+                        )
                       ],
                     ),
                   );
@@ -130,7 +130,7 @@ class _UploadJobNowState extends State<UploadJobNow> {
 
   @override
   Widget build(BuildContext context) {
-    Size size=MediaQuery.of(context).size;
+    Size size = MediaQuery.of(context).size;
     return Container(
       decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -200,7 +200,7 @@ class _UploadJobNowState extends State<UploadJobNow> {
                               controller: _jobcategoryController,
                               enabled: false,
                               fct: () {
-                                _showTaskCategoriesDialog(size: size)
+                                _showTaskCategoriesDialog(size: size);
                               },
                               maxLength: 100,
                             ),
