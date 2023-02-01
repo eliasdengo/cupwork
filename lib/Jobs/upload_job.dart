@@ -1,6 +1,8 @@
 import 'package:cupwork/Widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 
+import '../Persistent/persistent.dart';
+
 class UploadJobNow extends StatefulWidget {
   @override
   State<UploadJobNow> createState() => _UploadJobNowState();
@@ -14,6 +16,7 @@ class _UploadJobNowState extends State<UploadJobNow> {
       TextEditingController();
   final TextEditingController _jobDeadlineDateController =
       TextEditingController();
+  bool isLoading = false;
 
   final _formkey = GlobalKey<FormState>();
 
@@ -74,8 +77,60 @@ class _UploadJobNowState extends State<UploadJobNow> {
     );
   }
 
+  _showTaskCategoriesDialog({required Size size}) {
+    showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            backgroundColor: Colors.black54,
+            title: Text(
+              'Job Category',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            content: Container(
+              width: size.width * 0.9,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: Persistent.jobCategoryList.length,
+                itemBuilder: (ctxx, index) {
+                  return InkWell(
+                    onTap: () {
+                      setState(() {
+                        _jobcategoryController.text =
+                            Persistent.jobCategoryList[index];
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.arrow_right_alt_outlined,
+                          color: Colors.grey,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            Persistent.jobCategoryList[index],
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                            ),
+                          ),
+                          )
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
+    Size size=MediaQuery.of(context).size;
     return Container(
       decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -144,7 +199,9 @@ class _UploadJobNowState extends State<UploadJobNow> {
                               valueKey: 'JobCategory',
                               controller: _jobcategoryController,
                               enabled: false,
-                              fct: () {},
+                              fct: () {
+                                _showTaskCategoriesDialog(size: size)
+                              },
                               maxLength: 100,
                             ),
                             _textTitles(label: 'Job Title :'),
@@ -174,7 +231,47 @@ class _UploadJobNowState extends State<UploadJobNow> {
                           ],
                         ),
                       ),
-                    )
+                    ),
+                    Center(
+                      child: Padding(
+                          padding: EdgeInsets.only(bottom: 30),
+                          child: isLoading
+                              ? CircularProgressIndicator()
+                              : MaterialButton(
+                                  onPressed: () {},
+                                  color: Colors.black,
+                                  elevation: 8,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(13),
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 14),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.upload_file,
+                                          color: Colors.white,
+                                        ),
+                                        SizedBox(
+                                          width: 9,
+                                        ),
+                                        Text(
+                                          'Post Now',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 28,
+                                            fontFamily: 'Signatra',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )),
+                    ),
                   ],
                 ),
               ),
