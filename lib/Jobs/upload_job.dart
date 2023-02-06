@@ -3,6 +3,7 @@ import 'package:cupwork/Services/global_methods.dart';
 import 'package:cupwork/Widgets/bottom_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
 
 import '../Persistent/persistent.dart';
@@ -199,7 +200,31 @@ class _UploadJobNowState extends State<UploadJobNow> {
           'location': location,
           'applicants': 0,
         });
-      } catch (error) {}
+        await Fluttertoast.showToast(
+          msg: 'The task has been uload',
+          toastLength: Toast.LENGTH_LONG,
+          backgroundColor: Colors.grey,
+          fontSize: 18.0,
+        );
+        _jobTitleController.clear();
+        _jobDescriptionController.clear();
+        setState(() {
+          _jobcategoryController.text = 'Choose job category';
+          _jobDeadlineDateController.text = 'Choose job Deadline';
+        });
+      } catch (error) {
+        setState(() {
+          isLoading = false;
+        });
+
+        GlobalMethod.showErrorDialog(error: error.toString(), ctx: context);
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } else {
+      print('Its not valid');
     }
   }
 
