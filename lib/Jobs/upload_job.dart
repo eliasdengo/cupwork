@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cupwork/Services/global_methods.dart';
 import 'package:cupwork/Widgets/bottom_nav_bar.dart';
@@ -183,26 +181,25 @@ class _UploadJobNowState extends State<UploadJobNow> {
         isLoading = true;
       });
 
-      try
-      {
-    await FirebaseFirestore.instance.collection('jobs').doc(jobId).set({
-       'jobId':jobId,
-       'uploadedBy':_uid,
-       'email':user.email,
-       'jobTitle':_jobTitleController.text,
-       'jobDescription':_jobDescriptionController.text,
-       'deadlineDate':_jobDeadlineDateController.text,
-       'deadlineDateTimeStamp':deadlineDateTimeStamp,
-       'jobCategory':_jobcategoryController.text,
-       'jobComments':[],
-       'recruitment':true,
-       'createdAt':Timestamp.now(),
-       'name':name,
-       'userImage':userImage,
-       'location':location,
-       'applicants':0,
-    });s
-      }
+      try {
+        await FirebaseFirestore.instance.collection('jobs').doc(jobId).set({
+          'jobId': jobId,
+          'uploadedBy': _uid,
+          'email': user.email,
+          'jobTitle': _jobTitleController.text,
+          'jobDescription': _jobDescriptionController.text,
+          'deadlineDate': _jobDeadlineDateController.text,
+          'deadlineDateTimeStamp': deadlineDateTimeStamp,
+          'jobCategory': _jobcategoryController.text,
+          'jobComments': [],
+          'recruitment': true,
+          'createdAt': Timestamp.now(),
+          'name': name,
+          'userImage': userImage,
+          'location': location,
+          'applicants': 0,
+        });
+      } catch (error) {}
     }
   }
 
@@ -323,7 +320,9 @@ class _UploadJobNowState extends State<UploadJobNow> {
                           child: isLoading
                               ? CircularProgressIndicator()
                               : MaterialButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    _uploadTask();
+                                  },
                                   color: Colors.black,
                                   elevation: 8,
                                   shape: RoundedRectangleBorder(
