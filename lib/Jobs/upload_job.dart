@@ -1,7 +1,14 @@
+import 'dart:html';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cupwork/Services/global_methods.dart';
 import 'package:cupwork/Widgets/bottom_nav_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 import '../Persistent/persistent.dart';
+import '../Services/global_variables.dart';
 
 class UploadJobNow extends StatefulWidget {
   @override
@@ -15,7 +22,10 @@ class _UploadJobNowState extends State<UploadJobNow> {
   final TextEditingController _jobDescriptionController =
       TextEditingController();
   final TextEditingController _jobDeadlineDateController =
-      TextEditingController();
+      TextEditingController(text: 'Job Deadline Date');
+
+  DateTime? picked;
+  Timestamp? deadlineDateTimeStamp;
   bool isLoading = false;
 
   final _formkey = GlobalKey<FormState>();
@@ -124,8 +134,76 @@ class _UploadJobNowState extends State<UploadJobNow> {
                 },
               ),
             ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.canPop(context) ? Navigator.pop(context) : null;
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  )),
+            ],
           );
         });
+  }
+
+  void _pickDateDialog() async {
+    picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now().subtract(
+          Duration(days: 0),
+        ),
+        lastDate: DateTime(2100));
+    if (picked != null) {
+      setState(() {
+        _jobDeadlineDateController.text =
+            '${picked!.year}-${picked!.month}-${picked!.day}';
+
+        deadlineDateTimeStamp = Timestamp.fromMicrosecondsSinceEpoch(
+            picked!.microsecondsSinceEpoch);
+      });
+    }
+  }
+
+  void _uploadTask() async {
+    final jobId = const Uuid().v4();
+    User? user = FirebaseAuth.instance.currentUser;
+    final _uid = user!.uid;
+    final isValid = _formkey.currentState!.validate();
+    if (isValid) {
+      if (_jobDeadlineDateController.text == 'Choose job Deadline date' ||
+          _jobcategoryController.text == 'Choose job category') {
+        GlobalMethod.showErrorDialog(
+            error: 'please pick everything', ctx: context);
+        return;
+      }
+      setState(() {
+        isLoading = true;
+      });
+
+      try
+      {
+    await FirebaseFirestore.instance.collection('jobs').doc(jobId).set({
+       'jobId':jobId,
+       'uploadedBy':_uid,
+       'email':user.email,
+       'jobTitle':_jobTitleController.text,
+       'jobDescription':_jobDescriptionController.text,
+       'deadlineDate':_jobDeadlineDateController.text,
+       'deadlineDateTimeStamp':deadlineDateTimeStamp,
+       'jobCategory':_jobcategoryController.text,
+       'jobComments':[],
+       'recruitment':true,
+       'createdAt':Timestamp.now(),
+       'name':name,
+       'userImage':userImage,
+       'location':location,
+       'applicants':0,
+    });s
+      }
+    }
   }
 
   @override
@@ -142,7 +220,9 @@ class _UploadJobNowState extends State<UploadJobNow> {
       child: Scaffold(
         bottomNavigationBar: BottomNavigationBarForApp(indexNum: 2),
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
+        /*
+          #### if you don't want to use App delete it or set as it is  else you can use it by removing comment the app bar ###
+       appBar: AppBar(
           title: Text('Upload Job Now'),
           centerTitle: true,
           flexibleSpace: Container(
@@ -155,6 +235,9 @@ class _UploadJobNowState extends State<UploadJobNow> {
             )),
           ),
         ),
+        
+        */
+
         body: Center(
           child: Padding(
             padding: EdgeInsets.all(7.0),
@@ -224,8 +307,10 @@ class _UploadJobNowState extends State<UploadJobNow> {
                             _textFormFields(
                               valueKey: 'Deadline',
                               controller: _jobDeadlineDateController,
-                              enabled: true,
-                              fct: () {},
+                              enabled: false,
+                              fct: () {
+                                _pickDateDialog();
+                              },
                               maxLength: 100,
                             ),
                           ],
