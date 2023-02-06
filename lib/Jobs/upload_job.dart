@@ -27,6 +27,14 @@ class _UploadJobNowState extends State<UploadJobNow> {
   Timestamp? deadlineDateTimeStamp;
   bool isLoading = false;
 
+  void dispose() {
+    super.dispose();
+    _jobDeadlineDateController.dispose();
+    _jobDescriptionController.dispose();
+    _jobTitleController.dispose();
+    _jobcategoryController.dispose();
+  }
+
   final _formkey = GlobalKey<FormState>();
 
   Widget _textTitles({required String label}) {
