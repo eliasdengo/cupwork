@@ -1,3 +1,4 @@
+import 'package:cupwork/Search/search_job.dart';
 import 'package:cupwork/Widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -106,6 +107,7 @@ class _JobsScreenState extends State<JobsScreen> {
               stops: const [0.2, 0.9],
             )),
           ),
+          automaticallyImplyLeading: false,
           leading: IconButton(
             icon: Icon(
               Icons.filter_list_rounded,
@@ -115,6 +117,15 @@ class _JobsScreenState extends State<JobsScreen> {
               _showTaskCategoriesDialog(size: size);
             },
           ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.search_outlined),
+              onPressed: () {
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (c) => SearchScreen()));
+              },
+            )
+          ],
         ),
       ),
     );
