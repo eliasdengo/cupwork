@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:cupwork/Jobs/jobs_screen.dart';
+import 'package:cupwork/Jobs/notify_screen.dart';
 import 'package:cupwork/Jobs/upload_job.dart';
 import 'package:cupwork/Search/profile_company.dart';
 import 'package:cupwork/Search/search_companies.dart';
@@ -108,6 +109,11 @@ class BottomNavigationBarForApp extends StatelessWidget {
           size: 19,
           color: Colors.black,
         ),
+        Icon(
+          Icons.notifications,
+          size: 19,
+          color: Colors.black,
+        ),
       ],
       animationDuration: Duration(
         milliseconds: 300,
@@ -127,6 +133,9 @@ class BottomNavigationBarForApp extends StatelessWidget {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (_) => ProfileScreen()));
         } else if (index == 4) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => notifyScreen()));
+        } else if (index == 5) {
           _logout(context);
         }
       },
