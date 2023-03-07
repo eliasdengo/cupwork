@@ -2,11 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cupwork/Services/global_methods.dart';
 import 'package:cupwork/Widgets/bottom_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
-
 import '../Persistent/persistent.dart';
 import '../Services/global_variables.dart';
 
