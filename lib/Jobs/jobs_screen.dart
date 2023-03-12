@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cupwork/Search/search_job.dart';
 import 'package:cupwork/Widgets/bottom_nav_bar.dart';
-import 'package:cupwork/Widgets/job_widgwt.dart';
+import 'package:cupwork/Widgets/job_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../Persistent/persistent.dart';

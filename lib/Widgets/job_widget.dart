@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cupwork/Jobs/job_details.dart';
 import 'package:cupwork/Services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -91,7 +92,15 @@ class _JobWidgetState extends State<JobWidget> {
       elevation: 8,
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       child: ListTile(
-        onTap: () {},
+        onTap: () {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => JobDetailsScreen(
+                        uploadedBy: widget.uploadedBy,
+                        jobID: widget.jobId,
+                      )));
+        },
         onLongPress: () {
           _deleteDialog();
         },
