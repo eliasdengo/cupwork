@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cupwork/Jobs/jobs_screen.dart';
+import 'package:cupwork/Services/global_methods.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class JobDetailsScreen extends StatefulWidget {
@@ -12,6 +14,7 @@ class JobDetailsScreen extends StatefulWidget {
 }
 
 class _JobDetailsScreenState extends State<JobDetailsScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   String? authorName;
   String? userImageUrl;
   String? jobCategory;
@@ -72,6 +75,23 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
     getJobData();
   }
 
+  Widget dividerWidget() {
+    return Column(
+      children: [
+        SizedBox(
+          height: 10,
+        ),
+        Divider(
+          thickness: 1,
+          color: Colors.grey,
+        ),
+        SizedBox(
+          height: 10,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -124,6 +144,262 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 30),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 60,
+                            width: 60,
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                  width: 3,
+                                  color: Colors.grey,
+                                ),
+                                shape: BoxShape.rectangle,
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                    userImageUrl == null
+                                        ? 'https://t4.ftcdn.net/jpg/02/29/75/83/360_F_229758328_7x8jwCwjtBMmC6rgFzLFhZoEpLobB6L8.jpg'
+                                        : userImageUrl!,
+                                  ),
+                                  fit: BoxFit.fill,
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 10.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  authorName == null ? '' : authorName!,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 10,
+                                      color: Colors.white),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  locationCompany!,
+                                  style: TextStyle(color: Colors.grey),
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      dividerWidget(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            applicants.toString(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 6,
+                          ),
+                          Text(
+                            'Applicants',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Icon(
+                            Icons.how_to_reg_sharp,
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                      FirebaseAuth.instance.currentUser!.uid !=
+                              widget.uploadedBy
+                          ? Container()
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                dividerWidget(),
+                                Text(
+                                  'Recruitment',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        User? user = _auth.currentUser;
+                                        final _uid = user!.uid;
+                                        if (_uid == widget.uploadedBy) {
+                                          try {
+                                            FirebaseFirestore.instance
+                                                .collection('jobs')
+                                                .doc(widget.jobID)
+                                                .update({'recruitment': true});
+                                          } catch (error) {
+                                            GlobalMethod.showErrorDialog(
+                                                error:
+                                                    'Action cannot be performed',
+                                                ctx: context);
+                                          }
+                                        } else {
+                                          GlobalMethod.showErrorDialog(
+                                            error:
+                                                'You cannot perform this action',
+                                            ctx: context,
+                                          );
+                                        }
+                                        getJobData();
+                                      },
+                                      child: Text(
+                                        'ON',
+                                        style: TextStyle(
+                                            fontStyle: FontStyle.italic,
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.normal),
+                                      ),
+                                    ),
+                                    Opacity(
+                                      opacity: recruitment == true ? 1 : 0,
+                                      child: Icon(
+                                        Icons.check_box,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 40,
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        User? user = _auth.currentUser;
+                                        final _uid = user!.uid;
+                                        if (_uid == widget.uploadedBy) {
+                                          try {
+                                            FirebaseFirestore.instance
+                                                .collection('jobs')
+                                                .doc(widget.jobID)
+                                                .update({'recruitment': false});
+                                          } catch (error) {
+                                            GlobalMethod.showErrorDialog(
+                                                error:
+                                                    'Action cannot be performed',
+                                                ctx: context);
+                                          }
+                                        } else {
+                                          GlobalMethod.showErrorDialog(
+                                            error:
+                                                'You cannot perform this action',
+                                            ctx: context,
+                                          );
+                                        }
+                                        getJobData();
+                                      },
+                                      child: Text(
+                                        'OFF',
+                                        style: TextStyle(
+                                            fontStyle: FontStyle.italic,
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.normal),
+                                      ),
+                                    ),
+                                    Opacity(
+                                      opacity: recruitment == false ? 1 : 0,
+                                      child: Icon(
+                                        Icons.check_box,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                      dividerWidget(),
+                      Text(
+                        'Job Description',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        jobDescription == null ? '' : jobDescription!,
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      dividerWidget(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(4.0),
+              child: Card(
+                color: Colors.black54,
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Center(
+                        child: Text(
+                          isDeadlineAvailable
+                              ? 'Activity Recuiting, Send CV/Resume:'
+                              : 'Deadline Passed away.',
+                          style: TextStyle(
+                            color:
+                                isDeadlineAvailable ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 6,
+                      ),
+                      Center(
+                        child: MaterialButton(
+                          onPressed: () {},
+                          color: Colors.blue,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(13),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            child: Text(
+                              'Easy Apply Now',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
                         ),
                       )
                     ],
