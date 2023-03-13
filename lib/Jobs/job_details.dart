@@ -1,8 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cupwork/Jobs/jobs_screen.dart';
 import 'package:cupwork/Services/global_methods.dart';
+import 'package:cupwork/Services/global_variables.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+import 'package:uuid/uuid.dart';
 
 class JobDetailsScreen extends StatefulWidget {
   final String uploadedBy;
@@ -15,6 +19,8 @@ class JobDetailsScreen extends StatefulWidget {
 
 class _JobDetailsScreenState extends State<JobDetailsScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _commentController = TextEditingController();
+  bool _isCommenting = false;
   String? authorName;
   String? userImageUrl;
   String? jobCategory;
@@ -29,6 +35,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
   String? emailCompany = '';
   int applicants = 0;
   bool isDeadlineAvailable = false;
+  bool showComment = false;
   void getJobData() async {
     final DocumentSnapshot userDoc = await FirebaseFirestore.instance
         .collection('users')
@@ -90,6 +97,29 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
         ),
       ],
     );
+  }
+
+  applyForJob() {
+    final Uri params = Uri(
+      scheme: 'mailto',
+      path: emailCompany,
+      query:
+          'Subjects Applying for $jobTitle&body=Hello,please attach Resume CV file',
+    );
+    final url = params.toString();
+
+    launchUrlString(url);
+    addNewApplicant();
+  }
+
+  void addNewApplicant() async {
+    var docRef =
+        FirebaseFirestore.instance.collection('jobs').doc(widget.jobID);
+
+    docRef.update({
+      'applicants': applicants + 1,
+    });
+    Navigator.pop(context);
   }
 
   @override
@@ -383,7 +413,9 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                       ),
                       Center(
                         child: MaterialButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            applyForJob();
+                          },
                           color: Colors.blue,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -401,7 +433,203 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                             ),
                           ),
                         ),
-                      )
+                      ),
+                      dividerWidget(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Uploaded on:',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            postedDate == null ? '' : postedDate!,
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Deadline Date:',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            deadlineDate == null ? '' : deadlineDate!,
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15),
+                          )
+                        ],
+                      ),
+                      dividerWidget(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(4.0),
+              child: Card(
+                color: Colors.black54,
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AnimatedSwitcher(
+                          duration: Duration(milliseconds: 500),
+                          child: _isCommenting
+                              ? Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Flexible(
+                                        flex: 3,
+                                        child: TextField(
+                                          controller: _commentController,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                          maxLength: 200,
+                                          keyboardType: TextInputType.text,
+                                          maxLines: 6,
+                                          decoration: InputDecoration(
+                                            filled: true,
+                                            fillColor: Theme.of(context)
+                                                .scaffoldBackgroundColor,
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.pink)),
+                                          ),
+                                        )),
+                                    Flexible(
+                                        child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          child: MaterialButton(
+                                            onPressed: () async {
+                                              if (_commentController
+                                                      .text.length <
+                                                  7) {
+                                                GlobalMethod.showErrorDialog(
+                                                  error:
+                                                      'Comment cannot be less than 7 characters',
+                                                  ctx: context,
+                                                );
+                                              } else {
+                                                final _generatedId =
+                                                    Uuid().v4();
+                                                await FirebaseFirestore.instance
+                                                    .collection('jobs')
+                                                    .doc(widget.jobID)
+                                                    .update({
+                                                  'jobComments':
+                                                      FieldValue.arrayUnion([
+                                                    {
+                                                      'userId': FirebaseAuth
+                                                          .instance
+                                                          .currentUser!
+                                                          .uid,
+                                                      'commentId': _generatedId,
+                                                      'name': name,
+                                                      'userImageUrl': userImage,
+                                                      'commentBody':
+                                                          _commentController
+                                                              .text,
+                                                      'time': Timestamp.now(),
+                                                    }
+                                                  ]),
+                                                });
+                                                await Fluttertoast.showToast(
+                                                  msg:
+                                                      'your comment has been added',
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  backgroundColor: Colors.grey,
+                                                  fontSize: 18.0,
+                                                );
+                                                _commentController.clear();
+                                              }
+                                              setState(() {
+                                                showComment = true;
+                                              });
+                                            },
+                                            color: Colors.blueAccent,
+                                            elevation: 0,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                            ),
+                                            child: Text(
+                                              'Post',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        TextButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _isCommenting = !_isCommenting;
+                                                showComment = false;
+                                              });
+                                            },
+                                            child: Text('cancel'))
+                                      ],
+                                    ))
+                                  ],
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _isCommenting = !_isCommenting;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          Icons.add_comment,
+                                          color: Colors.blueAccent,
+                                          size: 40,
+                                        )),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            showComment = false;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          Icons.arrow_drop_down_circle,
+                                          color: Colors.blueAccent,
+                                          size: 40,
+                                        ))
+                                  ],
+                                ))
                     ],
                   ),
                 ),
