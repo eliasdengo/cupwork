@@ -1,3 +1,4 @@
+import 'package:cupwork/Search/profile_company.dart';
 import 'package:flutter/material.dart';
 
 class CommentWidget extends StatefulWidget {
@@ -33,7 +34,13 @@ class _CommentWidgetState extends State<CommentWidget> {
   Widget build(BuildContext context) {
     _colors.shuffle();
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    ProfileScreen(userID: widget.commenterId)));
+      },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
