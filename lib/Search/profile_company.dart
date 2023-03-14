@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cupwork/Widgets/bottom_nav_bar.dart';
+import 'package:cupwork/user_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -176,7 +177,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 padding:
                                                     EdgeInsets.only(bottom: 30),
                                                 child: MaterialButton(
-                                                  onPressed: () {},
+                                                  onPressed: () {
+                                                    _auth.signOut();
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              UserState(),
+                                                        ));
+                                                  },
                                                   color: Colors.black,
                                                   elevation: 8,
                                                   shape: RoundedRectangleBorder(
