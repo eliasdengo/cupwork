@@ -5,14 +5,14 @@ class CommentWidget extends StatefulWidget {
   final String commenterId;
   final String commenterName;
   final String commentBody;
-  final String commentImageUrl;
+  final String commenterImageUrl;
 
   CommentWidget(
       {required this.commentId,
       required this.commenterId,
       required this.commenterName,
       required this.commentBody,
-      required this.commentImageUrl});
+      required this.commenterImageUrl});
 
   @override
   State<CommentWidget> createState() => _CommentWidgetState();
@@ -50,7 +50,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                     ),
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: NetworkImage(widget.commentImageUrl),
+                      image: NetworkImage(widget.commenterImageUrl),
                       fit: BoxFit.fill,
                     )),
               )),

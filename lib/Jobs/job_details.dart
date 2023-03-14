@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cupwork/Jobs/jobs_screen.dart';
 import 'package:cupwork/Services/global_methods.dart';
 import 'package:cupwork/Services/global_variables.dart';
+import 'package:cupwork/Widgets/comments_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -620,7 +621,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                                     IconButton(
                                         onPressed: () {
                                           setState(() {
-                                            showComment = false;
+                                            showComment = true;
                                           });
                                         },
                                         icon: Icon(
@@ -629,7 +630,62 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                                           size: 40,
                                         ))
                                   ],
-                                ))
+                                )),
+                      showComment == false
+                          ? Container()
+                          : Padding(
+                              padding: EdgeInsets.all(6.0),
+                              child: FutureBuilder<DocumentSnapshot>(
+                                future: FirebaseFirestore.instance
+                                    .collection('jobs')
+                                    .doc(widget.jobID)
+                                    .get(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  } else {
+                                    if (snapshot.data == null) {
+                                      Center(
+                                        child: Text('No comment for this job'),
+                                      );
+                                    }
+                                  }
+                                  return ListView.separated(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      return CommentWidget(
+                                        commentId: snapshot.data!['jobComments']
+                                            [index]['commentId'],
+                                        commenterId:
+                                            snapshot.data!['jobComments'][index]
+                                                ['userId'],
+                                        commenterName:
+                                            snapshot.data!['jobComments'][index]
+                                                ['name'],
+                                        commentBody:
+                                            snapshot.data!['jobComments'][index]
+                                                ['commentBody'],
+                                        commenterImageUrl:
+                                            snapshot.data!['jobComments'][index]
+                                                ['userImageUrl'],
+                                      );
+                                    },
+                                    separatorBuilder: (context, index) {
+                                      return Divider(
+                                        thickness: 1,
+                                        color: Colors.grey,
+                                      );
+                                    },
+                                    itemCount:
+                                        snapshot.data!['jobComments'].length,
+                                  );
+                                },
+                              ),
+                            )
                     ],
                   ),
                 ),
